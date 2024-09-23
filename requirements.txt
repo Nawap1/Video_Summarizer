@@ -2,3 +2,4 @@ pytube
 yt-dlp
 ipython
 moviepy
+models
