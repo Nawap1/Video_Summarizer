@@ -2,6 +2,8 @@ import os
 import shutil
 import yt_dlp
 from moviepy.editor import AudioFileClip
+import re
+import requests
 
 def setup_output_directory(output_dir):
     if os.path.exists(output_dir):
@@ -42,6 +44,42 @@ def process_youtube_video(video_url):
     
     convert_audio_to_mp3(input_audio_path, output_mp3_path)
 
+def clean_captions(raw_captions):
+    lines = raw_captions.decode('utf-8').split('\n')
+    cleaned_captions = []
+    timestamp_pattern = re.compile(r'\d{2}:\d{2}:\d{2}\.\d{3} --> \d{2}:\d{2}:\d{2}\.\d{3}')
+    
+    for line in lines:
+        if line and not line.startswith('WEBVTT') and not timestamp_pattern.match(line):
+            cleaned_line = line.strip()
+            if cleaned_line:
+                cleaned_captions.append(cleaned_line)
+    
+    return ' '.join(cleaned_captions)
+
+def extract_subtitles(video_url):
+    subtitle_options = {
+        'writesubtitles': True,
+        'subtitleslangs': ['en'],
+        'subtitlesformat': 'vtt',
+        'skip_download': True,
+    }
+
+    with yt_dlp.YoutubeDL(subtitle_options) as youtube_downloader:
+        info_dict = youtube_downloader.extract_info(video_url, download=False)
+        subtitles = info_dict.get('requested_subtitles', None)
+        
+        if subtitles:
+            print(f"Subtitles available for {video_url}")
+            for lang, subtitle_info in subtitles.items():
+                subtitle_url = subtitle_info.get('url')
+                if subtitle_url:
+                    response = requests.get(subtitle_url)
+                    if response.status_code == 200:
+                        raw_subtitles = response.content
+                        return clean_captions(raw_subtitles)
+ 
 if __name__ == "__main__":
     youtube_video_url = "https://www.youtube.com/watch?v=y4zdDXPYo0I"
     process_youtube_video(youtube_video_url)
+    

@@ -6,7 +6,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.summarize import load_summarize_chain
 from langchain.text_splitter import TokenTextSplitter
 from langchain.schema import Document
-from mp4_downloader import process_youtube_video
+from mp4_downloader import *
 from transcribe import WhisperTranscriber
 import os
 
@@ -74,15 +74,23 @@ def summarize_transcript(transcript):
 @app.post("/summarize")
 async def summarize_youtube_video(youtube_url: YouTubeURL):
     try:
-        print("Getting YouTube Video's Audio...")
-        process_youtube_video(youtube_url.url)
-        audio_file = r"Saved_Media\audio.mp3"
-        if not os.path.exists(audio_file):
-            raise FileNotFoundError(f"Audio file not found: {audio_file}")
-        
-        print("Transcribing Audio...")
-        transcriber = WhisperTranscriber()
-        transcribed_text = transcriber.transcribe(audio_file)
+
+        existing_subtitles = extract_subtitles(youtube_url.url)
+        if existing_subtitles:
+            print("Subtitles found ... Extracted Subtitles from YouTube Video...")
+            transcribed_text = existing_subtitles
+        else:
+
+            print("Getting YouTube Video's Audio...")
+            process_youtube_video(youtube_url.url)
+            audio_file = r"Saved_Media\audio.mp3"
+            if not os.path.exists(audio_file):
+                raise FileNotFoundError(f"Audio file not found: {audio_file}")
+            
+            print("Transcribing Audio...")
+
+            transcriber = WhisperTranscriber()
+            transcribed_text = transcriber.transcribe(audio_file)
         
         print("Summarizing YouTube transcript...")
         summary = summarize_transcript(transcribed_text)
