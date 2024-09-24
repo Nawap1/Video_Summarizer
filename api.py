@@ -9,9 +9,16 @@ from langchain.schema import Document
 from mp4_downloader import process_youtube_video
 from transcribe import WhisperTranscriber
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace "*" with specific domains to restrict access if needed
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow specific HTTP methods or all
+    allow_headers=["*"],  # Allow specific headers or all
+)
 class YouTubeURL(BaseModel):
     url: str
 
@@ -95,4 +102,4 @@ async def summarize_youtube_video(youtube_url: YouTubeURL):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="localhost", port=8000)
