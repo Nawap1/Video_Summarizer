@@ -13,18 +13,21 @@ def setup_output_directory(output_dir):
 def download_youtube_video_and_audio(video_url, output_dir='Saved_Media'):
     setup_output_directory(output_dir)
 
-    video_options = {
-        'format': 'best',
-        'outtmpl': os.path.join(output_dir, 'video.%(ext)s'),
-    }
+    # Commented as the video download is not required
+    # video_options = {
+    #     'format': 'best',
+    #     'outtmpl': os.path.join(output_dir, 'video.%(ext)s'),
+    # }
+
     audio_options = {
         'format': 'bestaudio/best',
         'outtmpl': os.path.join(output_dir, 'audio.%(ext)s'),
     }
 
-    for download_options in [video_options, audio_options]:
-        with yt_dlp.YoutubeDL(download_options) as youtube_downloader:
-            youtube_downloader.download([video_url])
+    # for download_options in [video_options, audio_options]:
+
+    with yt_dlp.YoutubeDL(audio_options) as youtube_downloader:
+        youtube_downloader.download([video_url])
 
     print("Video and audio download completed!")
 
@@ -82,4 +85,3 @@ def extract_subtitles(video_url):
 if __name__ == "__main__":
     youtube_video_url = "https://www.youtube.com/watch?v=y4zdDXPYo0I"
     process_youtube_video(youtube_video_url)
-    
