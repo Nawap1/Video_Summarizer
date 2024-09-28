@@ -16,6 +16,7 @@ To set up the LLM, follow the instructions below:
 ### 1. Download the Quantized Model
 
 - Navigate to this [link](https://huggingface.co/bartowski/Phi-3.5-mini-instruct-GGUF/resolve/main/Phi-3.5-mini-instruct-Q4_K_L.gguf?download=true) and download the **Phi-3.5-mini-instruct-Q4_K_L.gguf** model.
+- After downloading, create a directory /Model and place the downloaded quantized model inside.
 
 ### 2. Install Ollama
 
